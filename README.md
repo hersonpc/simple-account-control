@@ -1,2 +1,9 @@
 # simple-account-control
-Sistema de Controle de Contas - Python 2.7 - Pós-graduação
+
+Curso: **CIÊNCIA DE DADOS E BIG DATA ANALYTICS**.  
+Disciplina: **PRATICA E LABORATORIO II**.  
+
+
+## Introdução
+
+Sistema de controle bancário
