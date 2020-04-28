@@ -6,6 +6,7 @@ from cliente import Cliente
 from conta import Conta
 from conta_especial import ContaEspecial
 
+
 class Banco(object):
     
     def __init__(self):
@@ -14,13 +15,14 @@ class Banco(object):
             "CONTAS": []
         }
         self._conta_selecionada = 0
-        self._filename = 'database.gz'
-        self.store(True)
+        self._filename = 'database.bin.gz'
+        # self.store(True) # Criar dados de demostracao automaticamente...
         self.load()
 
 
     def store(self, seed = False):
         if(seed):
+            # populando com dados de demostracao...
             clientes = [
                 {   "TIPO": "COMUM", 
                     "SALDO_INI": 380.00, 
@@ -54,6 +56,7 @@ class Banco(object):
                 self._dataset["CLIENTES"].append(cliente["CADASTRO"])
                 self._dataset["CONTAS"].append(conta)
 
+        # salvar em arquivo binario compactado...
         with open(self._filename, 'wb') as fp:
             fp.write(zlib.compress(pickle.dumps(self._dataset, pickle.HIGHEST_PROTOCOL),9))
         
@@ -90,9 +93,7 @@ class Banco(object):
 
     def findConta(self, num_conta):
         for conta in self._dataset["CONTAS"]:
-            # print(conta.getNumero(), num_conta)
             if(conta.getNumero() == num_conta):
-                # raw_input("achou!!!!")
                 return conta
         return {}
 
@@ -153,7 +154,7 @@ class Banco(object):
         print_center("Relatorio das contas cadastradas")
         print_center("="*73)
         print_center("| {:6s} | {:30s} | {:12s} | {:12s} |".format("COD", "NOME DO CLIENTE", "NUM. CONTA", "SALDO DISP."))
-        print_center("| {:6s} + {:30s} + {:12s} + {:12s} |".format("-"*6, "-"*30, "-"*12, "-"*12))
+        print_center("|-{:6s}-+-{:30s}-+-{:12s}-+-{:12s}-|".format("-"*6, "-"*30, "-"*12, "-"*12))
         for conta in self._dataset["CONTAS"]:
             cliente = self.findClienteByID(conta.getClienteID())
             print_center("| {:6d} | {:30s} | {:12d} | {:12.2f} |".format(

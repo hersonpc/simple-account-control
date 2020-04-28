@@ -1,5 +1,5 @@
 from conta import Conta
-# from interfaceBancaria import ContaBancaria
+
 
 class ContaEspecial(Conta):
     

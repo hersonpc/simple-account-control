@@ -12,8 +12,6 @@
 
 from banco import Banco
 from cliente import Cliente
-from conta import Conta
-from conta_especial import ContaEspecial
 from utils import limpar_tela, print_center, sair_app
 
 
@@ -64,7 +62,7 @@ def menu():
     print("="*80)
 
     try:
-        opcao = int(raw_input("Opcao: ")[:1])
+        opcao = int(raw_input("\nOpcao: ")[:1])
     except:
         menu()
         return
@@ -81,41 +79,8 @@ def menu():
     menu()
     return
 
+
+## inicializacao ########################
 limpar_tela()
 banco = Banco()
 menu()
-
-# cliente = Cliente("Joao Silva", "62 99001-1234")
-
-# conta = cliente.setConta(Conta(3421, 0)).getConta()
-
-# print("\tNome do cliente: " + cliente.getName())
-# print("\tConta: " + str(conta.getNumero()))
-# print("\tSaldo inicial: " + conta.getSaldo())
-
-# conta.deposito(1000.0)
-# conta.saque(2000)
-# conta.saque(1000)
-# conta.saque(60)
-# conta.saque(60)
-
-# conta.extrato()
-
-
-# print("\n")
-# cliente2 = Cliente("Maria Silva", "62 99001-9999")
-
-# conta2 = cliente2.setConta(ContaEspecial(9812, 0, 0)).getConta()
-
-# print("\tNome do cliente: " + cliente2.getName())
-# print("\tConta: " + str(conta2.getNumero()))
-# print("\tSaldo inicial: " + conta2.getSaldo())
-
-# conta2.deposito(1000.0)
-# conta2.limite(100.0)
-# conta2.saque(2000)
-# conta2.saque(1000)
-# conta2.saque(60)
-# conta2.saque(60)
-
-# conta2.extrato()

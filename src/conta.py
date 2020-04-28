@@ -2,6 +2,7 @@ import pickle
 import random
 from utils import print_center
 
+
 class Conta(object):
     
     def __init__(self, cliente_id, codigo = 0, saldo = 0):
@@ -51,7 +52,7 @@ class Conta(object):
     def extrato(self):
         print_center("="*77)
         print_center("| {:15s} | {:12s} | {:25s} | {:12s} |".format("OPERACAO", "VALOR ($)", "STATUS", "SALDO ($)"))
-        print_center("| {:15s} + {:12s} + {:25s} + {:12s} |".format("-"*15, "-"*12, "-"*25, "-"*12))
+        print_center("|-{:15s}-+-{:12s}-+-{:25s}-+-{:12s}-|".format("-"*15, "-"*12, "-"*25, "-"*12))
         for evento in self._historico:
             print_center(evento)
         print_center("="*77)
