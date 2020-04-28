@@ -77,7 +77,7 @@ class Banco(object):
                     self._dataset = payload
                 f.close()
         except Exception as e:
-            raise
+            self.store()
 
 
     def setContaSelecionada(self, num_conta):
