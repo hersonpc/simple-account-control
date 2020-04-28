@@ -13,26 +13,46 @@ class Banco(object):
             "CLIENTES": [], 
             "CONTAS": []
         }
-        self._conta_selecionada = []
+        self._conta_selecionada = 0
         self._filename = 'database.gz'
-        # self.store(True)
+        self.store(True)
         self.load()
 
 
     def store(self, seed = False):
         if(seed):
-            self._dataset["CLIENTES"].append(Cliente(32100, "Joaozinho Silva", "(62) 98001-0001"))
-            self._dataset["CLIENTES"].append(Cliente(32101, "Maria Souza", "(62) 98022-2222"))
-            self._dataset["CLIENTES"].append(Cliente(32102, "Getulio Vargas", "(11) 98044-4444"))
-            self._dataset["CLIENTES"].append(Cliente(10900, "Paulo Guedes", "(11) 98088-3210"))
-            self._dataset["CLIENTES"].append(Cliente(10800, "Silvio Santos", "(11) 98000-0000"))
-
-            self._dataset["CONTAS"].append(Conta(1011, 1000, 32100))
-            self._dataset["CONTAS"].append(Conta(1022, 0, 32101))
-            self._dataset["CONTAS"].append(Conta(1026, 0, 32102))
-
-            self._dataset["CONTAS"].append(ContaEspecial(7999,  10000, 10800).limite(100).limite(3500).limite(1000000))
-            self._dataset["CONTAS"].append(ContaEspecial(8000, 500000, 10900).limite(1000000))
+            clientes = [
+                {   "TIPO": "COMUM", 
+                    "SALDO_INI": 380.00, 
+                    "CADASTRO": Cliente("Joao da Silva Filho", "(62) 98001-0001") 
+                },
+                {   "TIPO": "COMUM", 
+                    "SALDO_INI": 50.00, 
+                    "CADASTRO": Cliente("Maria das gracas meneguel", "(62) 98022-2222") 
+                },
+                {   "TIPO": "ESPECIAL", 
+                    "SALDO_INI": 250000.00, 
+                    "LIMITE": 1000000, 
+                    "CADASTRO": Cliente("Silvio Santos", "(11) 98000-0000") 
+                },
+                {   "TIPO": "COMUM", 
+                    "SALDO_INI": 10.00, 
+                    "CADASTRO": Cliente("Getulio Vargas", "(11) 98044-4444") 
+                },
+                {   "TIPO": "ESPECIAL", 
+                    "SALDO_INI": 500000, 
+                    "LIMITE": 300000, 
+                    "CADASTRO": Cliente("Paulo Guedes", "(11) 98000-0001") 
+                }
+            ]
+            
+            for cliente in clientes:
+                if(cliente["TIPO"] == "COMUM"):
+                    conta = Conta(cliente_id = cliente["CADASTRO"].getID(), saldo = cliente["SALDO_INI"])
+                elif(cliente["TIPO"] == "ESPECIAL"):
+                    conta = ContaEspecial(cliente_id = cliente["CADASTRO"].getID(), saldo = cliente["SALDO_INI"]).limite(cliente["LIMITE"])
+                self._dataset["CLIENTES"].append(cliente["CADASTRO"])
+                self._dataset["CONTAS"].append(conta)
 
         with open(self._filename, 'wb') as fp:
             fp.write(zlib.compress(pickle.dumps(self._dataset, pickle.HIGHEST_PROTOCOL),9))
@@ -41,8 +61,7 @@ class Banco(object):
 
 
     def load(self):
-        # print("LOAD-"*5)
-        self._dataset["CONTAS"] = { 
+        self._dataset = { 
             "CLIENTES": [], 
             "CONTAS": []
         }
@@ -58,6 +77,10 @@ class Banco(object):
             raise
 
 
+    def setContaSelecionada(self, num_conta):
+        self._conta_selecionada = num_conta
+        return self
+
     def findClienteByID(self, id):
         for cliente in self._dataset["CLIENTES"]:
             if(cliente.getID() == id):
@@ -67,23 +90,81 @@ class Banco(object):
 
     def findConta(self, num_conta):
         for conta in self._dataset["CONTAS"]:
+            # print(conta.getNumero(), num_conta)
             if(conta.getNumero() == num_conta):
+                # raw_input("achou!!!!")
                 return conta
         return {}
 
 
+    def nova_conta(self):
+        print_center("Cadastrar nova conta\n")
+        print_center("="*80)
+
+        nome_cliente = None
+        telefone_cliente = None
+        tipo_cliente = None
+        limite_cliente = 0
+
+        nome_cliente = raw_input("Nome do cliente: ")[:50].strip().upper()
+        if(len(nome_cliente) <= 3):
+            raw_input("\nO nome informado e invalido!")
+            return
+        telefone_cliente = raw_input("Num. telefone: ")[:15].strip()
+        if(len(telefone_cliente) <= 8):
+            raw_input("\nO telefone informado e invalido!")
+            return
+
+        tipo_cliente = raw_input("Qual a categoria deste cliente? [C]omun ou [E]special: ")[:1].strip().upper()
+        if((tipo_cliente != "C") and (tipo_cliente != "E")):
+            raw_input("\nO tipo informado e invalido!")
+            return
+        if(tipo_cliente == "E"):
+            limite_cliente = float(raw_input("Qual limite bancario deste cliente? $ ")[:15].strip())
+            if((limite_cliente <= 0) or (limite_cliente > 10000)):
+                raw_input("\nO limite informado e invalido (o max. permitido e $ 10.000)!")
+                return
+
+
+        novo_cliente = Cliente(nome = nome_cliente, telefone = telefone_cliente)
+        num_cadastro_cliente = novo_cliente.getID()
+        if(tipo_cliente == "C"):
+            nova_conta = Conta(cliente_id = num_cadastro_cliente)
+        elif(tipo_cliente == "E"):
+            nova_conta = ContaEspecial(cliente_id = num_cadastro_cliente)
+            nova_conta.limite(limite_cliente)
+
+        self._dataset["CLIENTES"].append(novo_cliente)
+        self._dataset["CONTAS"].append(nova_conta)
+        
+        # persistir dados
+        self.store()
+
+        self.cabecalho_tela(nova_conta, novo_cliente)
+        print_center("Cliente cadastrado com sucesso!\n\n")
+        print_center("Codigo de cliente: {:8d}".format( nova_conta.getClienteID() ))
+        print_center("Numero conta: {:8d}\n\n\n".format( nova_conta.getNumero() ))
+
+        raw_input("\nPressione [ENTER] para voltar ao menu.")
+        return
+
+
     def listar_contas(self):
-        print_center("="*64)
-        print_center("| {:30s} | {:12s} | {:12s} |".format("NOME DO CLIENTE", "CONTA", "SALDO DISP."))
-        print_center("| {:30s} | {:12s} | {:12s} |".format("-"*30, "-"*12, "-"*12))
+        print_center("Relatorio das contas cadastradas")
+        print_center("="*73)
+        print_center("| {:6s} | {:30s} | {:12s} | {:12s} |".format("COD", "NOME DO CLIENTE", "NUM. CONTA", "SALDO DISP."))
+        print_center("| {:6s} + {:30s} + {:12s} + {:12s} |".format("-"*6, "-"*30, "-"*12, "-"*12))
         for conta in self._dataset["CONTAS"]:
             cliente = self.findClienteByID(conta.getClienteID())
-            print_center("| {:30s} | {:12d} | {:12.2f} |".format(
-                cliente.getNome(), 
-                conta.getNumero(), 
-                conta.getSaldoDisponivel()))
-        print_center("="*64)
-        raw_input("\nPressione [ENTER] para voltar ao menu.")
+            print_center("| {:6d} | {:30s} | {:12d} | {:12.2f} |".format(
+                    cliente.getID(), 
+                    cliente.getNome(), 
+                    conta.getNumero(), 
+                    conta.getSaldoDisponivel()
+                )
+            )
+        print_center("="*73)
+        return
 
 
     def gerar_extrato(self, conta, cliente):
@@ -91,7 +172,7 @@ class Banco(object):
         print_center("Extrato de movimentacoes\n")
 
         conta.extrato()
-        raw_input()
+        raw_input("\n\nPressione [ENTER] para voltar ao menu.")
         return
 
 
@@ -156,7 +237,7 @@ class Banco(object):
             raw_input("\nA conta informada e invalida ou nao foi localizada.")
             return
 
-        self._conta_selecionada = num_conta
+        self.setContaSelecionada(num_conta)
         return conta
 
 
@@ -169,16 +250,22 @@ class Banco(object):
         print("-"*80+"\n")
 
 
-    def menu_conta(self):
+    def menu_conta(self, num_conta = -1):
         limpar_tela()
 
         conta = None
         if(self._conta_selecionada > 0):
             conta = self.findConta(self._conta_selecionada)
+        elif(num_conta > 0):
+            conta = self.findConta(num_conta)
+
+        print(self._conta_selecionada, num_conta)
 
         if((conta is None) or (conta == {}) or (conta == [])):
             raw_input("\nA conta informada e invalida ou nao foi localizada.")
             return
+
+        self.setContaSelecionada(conta.getNumero()) # forca atualizar...
 
         cliente_id = conta.getClienteID()
         cliente = self.findClienteByID(cliente_id)

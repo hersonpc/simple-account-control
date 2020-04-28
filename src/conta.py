@@ -1,13 +1,21 @@
 import pickle
+import random
+from utils import print_center
 
 class Conta(object):
     
-    def __init__(self, numero, saldo, cliente_id):
+    def __init__(self, cliente_id, codigo = 0, saldo = 0):
         self._historico = []
-        self._numero = numero
-        self._saldo = saldo
+        if(codigo is None or codigo <= 0):
+            codigo = self.gerar_num_conta()
+        self._numero = codigo
         self._cliente_id = cliente_id
+        self._saldo = float(saldo)
         self.historico("DEP. ABERTURA", saldo, "REALIZADO")
+
+
+    def gerar_num_conta(self):
+        return random.randint(10000,99999)
 
 
     def getClienteID(self):
@@ -41,12 +49,12 @@ class Conta(object):
 
 
     def extrato(self):
-        print("="*77)
-        print("| {:15s} | {:12s} | {:25s} | {:12s} |".format("OPERACAO", "VALOR ($)", "STATUS", "SALDO ($)"))
-        print("| {:15s} | {:12s} | {:25s} | {:12s} |".format("-"*15, "-"*12, "-"*25, "-"*12))
+        print_center("="*77)
+        print_center("| {:15s} | {:12s} | {:25s} | {:12s} |".format("OPERACAO", "VALOR ($)", "STATUS", "SALDO ($)"))
+        print_center("| {:15s} + {:12s} + {:25s} + {:12s} |".format("-"*15, "-"*12, "-"*25, "-"*12))
         for evento in self._historico:
-            print(evento)
-        print("="*77)
+            print_center(evento)
+        print_center("="*77)
 
 
     def deposito(self, valor):

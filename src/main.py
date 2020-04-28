@@ -19,10 +19,19 @@ from utils import limpar_tela, print_center, sair_app
 
 def exibir_contas():
     limpar_tela()
-    print_center("Relatorio das contas cadastradas")
     banco.listar_contas()
+    try:
+        num_conta = int(raw_input("\nDigite o num. da conta para acessa-la \nou pressione [ENTER] para voltar ao menu.\n\nOpcao: ")[:10])
+    except:
+        return
+    banco.menu_conta(num_conta)
     return
 
+
+def cadastrar_conta():
+    limpar_tela()
+    banco.nova_conta()
+    return
 
 def entrar_menu_conta():
     limpar_tela()
@@ -45,7 +54,7 @@ def menu():
     print("Selecione uma das opcoes listadas abaixo e informe o codigo:")
     print("="*80)
     opcoes = [
-		# { "id": 1, "desc": "Criar conta"},
+		{ "id": 1, "desc": "Criar conta"},
 		{ "id": 2, "desc": "Relatorio de contas cadastradas"},
 		{ "id": 3, "desc": "Acessar uma conta"},
 		{ "id": 9, "desc": "Sair do aplicativo"},
@@ -62,8 +71,8 @@ def menu():
 
     if(opcao == 9):
         sair_app()
-	# elif(opcao == 1):
-	#
+    elif(opcao == 1):
+        cadastrar_conta()
     elif(opcao == 2):
         exibir_contas()
     elif(opcao == 3):
@@ -72,6 +81,7 @@ def menu():
     menu()
     return
 
+limpar_tela()
 banco = Banco()
 menu()
 

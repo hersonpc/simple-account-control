@@ -1,11 +1,15 @@
+import os
 import sys
 import math
 import time
-import subprocess as sp
 
 
 def limpar_tela():
-    tmp = sp.call('clear', shell=True)
+    if(os.name == "nt"):
+        os.system('cls')
+    else:
+        os.system('clear')
+    
     print("#"*80)
     print("CONTROLE BANCARIO PYTHON         POS-GRADUACAO DATA SCIENCE E BIG DATA ANALITYCS")
     print("2020-04-27" + " "*30 + " Autor: HERSON MELO (hersonpc@gmail.com)")
